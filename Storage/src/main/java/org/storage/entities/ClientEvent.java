@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bank.memory.DTO_entities.ClientEventDto;
+import org.springframework.lang.NonNull;
 
 import java.time.LocalDateTime;
 
@@ -34,7 +35,7 @@ public class ClientEvent {
     private String newValue;
 
 
-    public static ClientEvent fromDTO(ClientEventDto dto) {
+    public static @NonNull ClientEvent fromDTO(@NonNull ClientEventDto dto) {
         ClientEvent entity = new ClientEvent();
         entity.setEventType(dto.getEventType());
         entity.setEventTime(dto.getEventTime());

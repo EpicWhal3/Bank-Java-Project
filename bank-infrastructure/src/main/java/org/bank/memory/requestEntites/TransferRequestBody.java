@@ -1,5 +1,7 @@
 package org.bank.memory.requestEntites;
 
+import org.springframework.lang.NonNull;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +10,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class TransferRequestBody {
-    private Long fromAccountId;
-    private Long toAccountId;
+    private @NonNull Long fromAccountId;
+    private @NonNull Long toAccountId;
     private double amount;
 }

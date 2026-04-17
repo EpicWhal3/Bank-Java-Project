@@ -1,7 +1,6 @@
 package org.gateway.application.services;
 
 import org.gateway.application.interfaces.AdminApi;
-import org.gateway.config.BankApiConfig;
 import org.gateway.infrastructure.entities.GatewayUser;
 import org.gateway.infrastructure.entities.enums.Role;
 import org.gateway.infrastructure.repos.GatewayUserRepository;
@@ -14,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import java.util.List;
 
 @Service
@@ -22,8 +20,6 @@ import java.util.List;
 public class AdminServices {
     private final GatewayUserRepository gatewayUserRepository;
     private final PasswordEncoder passwordEncoder;
-    private final BankApiConfig bankApiConfig;
-    private final RestTemplate restTemplate;
 
     private final AdminApi adminApi;
 

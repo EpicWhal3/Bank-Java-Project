@@ -11,6 +11,7 @@ import org.bank.core.mappers.AccountMapper;
 import org.bank.core.mappers.UserMapper;
 import org.bank.memory.repos.UserRepository;
 import org.bank.memory.requestEntites.CreateUserRequest;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -71,7 +72,7 @@ public class UserService {
      * @param friend_id id друга
      */
     @Transactional
-    public ArrayList<UserDTO> addFriend(Long user_id, Long friend_id) throws Exception {
+    public ArrayList<UserDTO> addFriend(@NonNull Long user_id, @NonNull Long friend_id) throws Exception {
         User user = userRepository.findById(user_id).orElse(null);
         User friend = userRepository.findById(friend_id).orElse(null);
 
@@ -88,15 +89,13 @@ public class UserService {
         userEvent.setChanges(new ClientEventDto.FieldChanges(
                 "friends",
                 user.getFriends().size() - 1,
-                user.getFriends().size()
-        ));
+                user.getFriends().size()));
 
         ClientEventDto friendEvent = ClientEventDto.fromUser(friend, "UPDATED");
         friendEvent.setChanges(new ClientEventDto.FieldChanges(
                 "friends",
                 friend.getFriends().size() - 1,
-                friend.getFriends().size()
-        ));
+                friend.getFriends().size()));
 
         kafkaProducer.sendClientEvent(userEvent);
         kafkaProducer.sendClientEvent(friendEvent);
@@ -111,7 +110,7 @@ public class UserService {
      * @param friend_id id друга
      */
     @Transactional
-    public ArrayList<UserDTO> deleteFriend(Long user_id, Long friend_id) throws UserExceptions {
+    public ArrayList<UserDTO> deleteFriend(@NonNull Long user_id, @NonNull Long friend_id) throws UserExceptions {
         User user = userRepository.findById(user_id).orElse(null);
         User friend = userRepository.findById(friend_id).orElse(null);
         if (user == null || friend == null) {
@@ -127,15 +126,13 @@ public class UserService {
         userEvent.setChanges(new ClientEventDto.FieldChanges(
                 "friends",
                 user.getFriends().size() + 1,
-                user.getFriends().size()
-        ));
+                user.getFriends().size()));
 
         ClientEventDto friendEvent = ClientEventDto.fromUser(friend, "UPDATED");
         friendEvent.setChanges(new ClientEventDto.FieldChanges(
                 "friends",
                 user.getFriends().size() + 1,
-                friend.getFriends().size()
-        ));
+                friend.getFriends().size()));
 
         return new ArrayList<>(List.of(userMapper.toUserDTO(user), userMapper.toUserDTO(friend)));
     }
@@ -147,7 +144,7 @@ public class UserService {
      * @return счет пользователя
      */
     @Transactional(readOnly = true)
-    public List<AccountDTO> getUserAccounts(Long userid) throws UserExceptions {
+    public List<AccountDTO> getUserAccounts(@NonNull Long userid) throws UserExceptions {
         Optional<User> user = userRepository.findById(userid);
         if (user.isEmpty()) {
             throw UserExceptions.UserNotFoundException("Пользователь не найден.");
@@ -162,7 +159,7 @@ public class UserService {
      * @return список друзей пользователя
      */
     @Transactional(readOnly = true)
-    public List<Long> getUserFriends(Long userid) throws UserExceptions {
+    public List<Long> getUserFriends(@NonNull Long userid) throws UserExceptions {
         Optional<User> user = userRepository.findById(userid);
         if (user.isEmpty()) {
             throw UserExceptions.UserNotFoundException("Пользователь не найден.");
@@ -184,7 +181,6 @@ public class UserService {
         }
         return userMapper.toUserDTOs(user);
     }
-
 
     /**
      * Метод для получения всех пользователей с фильтрацией по цвету волос и полу.

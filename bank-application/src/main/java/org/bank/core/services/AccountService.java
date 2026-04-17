@@ -17,6 +17,7 @@ import org.bank.memory.repos.AccountRepository;
 import org.bank.memory.repos.TransactionRepository;
 import org.bank.memory.repos.UserRepository;
 import org.bank.memory.requestEntites.TransferRequestBody;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,7 +66,7 @@ public class AccountService {
      * @throws AccountExceptions исключение, если счёт не найден
      */
     @Transactional
-    public AccountDTO deposit(Long accountId, double amount) throws Exception {
+    public AccountDTO deposit(@NonNull Long accountId, double amount) throws Exception {
         Optional<Account> account = accountRepository.findById(accountId);
         if (account.isEmpty()) {
             throw AccountExceptions.AccountNotFoundException("Счет не найден");
@@ -81,13 +82,11 @@ public class AccountService {
         event.setChanges(new AccountEventDto.FieldChanges(
                 "balance",
                 oldBalance,
-                account.get().getBalance()
-        ));
+                account.get().getBalance()));
         event.setLastTransaction(new AccountEventDto.TransactionSummary(
                 tx.getId(),
                 tx.getType(),
-                tx.getAmount()
-        ));
+                tx.getAmount()));
         kafkaProducer.sendAccountEvent(event);
         return accountMapper.toAccountDTO(account.get());
     }
@@ -100,7 +99,7 @@ public class AccountService {
      * @throws AccountExceptions исключение, если счёт не найден
      */
     @Transactional
-    public AccountDTO withdraw(Long accountId, double amount) throws Exception {
+    public AccountDTO withdraw(@NonNull Long accountId, double amount) throws Exception {
         Account account = accountRepository.findById(accountId).orElse(null);
         if (account == null) {
             throw AccountExceptions.AccountNotFoundException("Счет не найден");
@@ -116,13 +115,11 @@ public class AccountService {
         event.setChanges(new AccountEventDto.FieldChanges(
                 "balance",
                 oldBalance,
-                account.getBalance()
-        ));
+                account.getBalance()));
         event.setLastTransaction(new AccountEventDto.TransactionSummary(
                 tx.getId(),
                 tx.getType(),
-                tx.getAmount()
-        ));
+                tx.getAmount()));
         kafkaProducer.sendAccountEvent(event);
 
         return accountMapper.toAccountDTO(account);
@@ -176,25 +173,21 @@ public class AccountService {
         fromEvent.setChanges(new AccountEventDto.FieldChanges(
                 "balance",
                 fromOldBalance,
-                fromAccount.getBalance()
-        ));
+                fromAccount.getBalance()));
         fromEvent.setLastTransaction(new AccountEventDto.TransactionSummary(
                 txFrom.getId(),
                 txFrom.getType(),
-                txFrom.getAmount()
-        ));
+                txFrom.getAmount()));
 
         AccountEventDto toEvent = AccountEventDto.fromAccount(toAccount, "UPDATED");
         toEvent.setChanges(new AccountEventDto.FieldChanges(
                 "balance",
                 toOldBalance,
-                toAccount.getBalance()
-        ));
+                toAccount.getBalance()));
         toEvent.setLastTransaction(new AccountEventDto.TransactionSummary(
                 txTo.getId(),
                 txTo.getType(),
-                txTo.getAmount()
-        ));
+                txTo.getAmount()));
 
         kafkaProducer.sendAccountEvent(fromEvent);
         kafkaProducer.sendAccountEvent(toEvent);
@@ -209,7 +202,7 @@ public class AccountService {
      * @param id идентификатор счёта
      */
     @Transactional(readOnly = true)
-    public AccountDTO checkBalance(Long id) throws AccountExceptions {
+    public AccountDTO checkBalance(@NonNull Long id) throws AccountExceptions {
         Optional<Account> account = accountRepository.findById(id);
         if (account.isEmpty()) {
             throw AccountExceptions.AccountNotFoundException("Счет не найден");
@@ -291,8 +284,8 @@ public class AccountService {
      * @return список операций
      */
     @Transactional(readOnly = true)
-    public List<TransactionDTO> getAllTransactionsByIdAndType(Long id, TransactionTypes transactionTypes) throws
-            AccountExceptions {
+    public List<TransactionDTO> getAllTransactionsByIdAndType(Long id, TransactionTypes transactionTypes)
+            throws AccountExceptions {
         List<Transaction> transactions = transactionRepository.findByAccountIdAndType(id, transactionTypes);
         if (transactions.isEmpty()) {
             throw AccountExceptions.NoTransactionsException("Нет операций по счету");

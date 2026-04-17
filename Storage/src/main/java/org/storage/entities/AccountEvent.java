@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bank.memory.DTO_entities.AccountEventDto;
+import org.springframework.lang.NonNull;
 
 import java.time.LocalDateTime;
 
@@ -33,7 +34,7 @@ public class AccountEvent {
     private String transactionType;
     private Double transactionAmount;
 
-    public static AccountEvent fromDTO(AccountEventDto dto) {
+    public static @NonNull AccountEvent fromDTO(@NonNull AccountEventDto dto) {
         AccountEvent entity = new AccountEvent();
         entity.setEventType(dto.getEventType());
         entity.setEventTime(dto.getEventTime());
